@@ -29,7 +29,6 @@ const VisContainer = ({styles:s}:PropType)=>{
                     break;
             }
         })  
-        console.log(fromA,fromB,fromS)
         if(runOnce) return;
         const {width,height} = (containerRef.current as unknown as HTMLElement).getBoundingClientRect();
       
