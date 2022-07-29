@@ -8,7 +8,12 @@ const Home: NextPage = () => {
       
 
       <main className={styles.main}>
-          <VisContainer/>
+          <VisContainer 
+              styles={{
+                  width:'80%',
+                  height:'80%'
+               }}
+            />
       </main>
     </div>
   )
