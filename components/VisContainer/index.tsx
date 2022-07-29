@@ -25,34 +25,91 @@ const VisContainer = ({styles:s}:PropType)=>{
         const svgRadius = (Math.sqrt(Math.pow(width,2) + Math.pow(height,2)))/2;
         const schoolUnivCircle = Math.floor(svgRadius*0.3) ;
         const padding = 20;
+
         const sba = svg.append('g')
                     .attr('transform',`translate(${ schoolUnivCircle+padding},${0+schoolUnivCircle+padding})`)
-                    .append('circle')
-                    .attr('r',schoolUnivCircle)
-                    .attr('cx',0)
-                    .attr('cy',0)
-                    .attr('stroke','purple')
-                    .attr('stroke-width','4')
-                    .attr('fill','transparent')
-        const algeirs = svg.append('g')
-                        .attr('transform',`translate(${ width - schoolUnivCircle -padding},${schoolUnivCircle+padding})`)
-                        .append('circle')
-                        .attr('r',schoolUnivCircle)
-                        .attr('cx',0)
-                        .attr('cy',0)
-                        .attr('stroke','purple')
-                        .attr('stroke-width','4')
-                        .attr('fill','transparent')
+                    
+               sba
+               .append('circle')
+               .attr('r',schoolUnivCircle)
+               .attr('cx',0)
+               .attr('cy',0)
+               .attr('stroke','black')
+               .attr('stroke-width','4')
+               .attr('fill','transparent')
 
-        const bejaia = svg.append('g')
-        .attr('transform',`translate(${ width/2 },${height -schoolUnivCircle - padding})`)
-        .append('circle')
-        .attr('r',schoolUnivCircle)
-        .attr('cx',0)
-        .attr('cy',0)
-        .attr('stroke','purple')
-        .attr('stroke-width','4')
-        .attr('fill','transparent')
+                sba
+                .append("circle")
+                .attr("r", 30)
+                .attr("cx",0)
+                .attr("cy",0)
+                .attr("fill","black")
+
+                sba.append('text')
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("dy", ".35em")
+                .attr('stroke',"white")
+                .attr("font-size", "14")
+                .attr("text-anchor", "middle")
+                .text('Sba')
+               
+
+        const algeirs = svg.append('g')
+                        .attr('transform',`translate(${ width - schoolUnivCircle -padding},${schoolUnivCircle+padding})`);
+            algeirs
+            .append('circle')
+            .attr('r',schoolUnivCircle)
+            .attr('cx',0)
+            .attr('cy',0)
+            .attr('stroke','black')
+            .attr('stroke-width','4')
+            .attr('fill','transparent')
+
+            algeirs
+            .append("circle")
+            .attr("r", 30)
+            .attr("cx",0)
+            .attr("cy",0)
+            .attr("fill","black")
+
+            algeirs
+            .append('text')
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("dy", ".35em")
+            .attr('stroke',"white")
+            .attr("font-size", "12")
+            .attr("text-anchor", "middle")
+            .text('Algeirs')
+
+            const bejaia = svg.append('g')
+            .attr('transform',`translate(${ width/2 },${height -schoolUnivCircle - padding})`);
+            bejaia
+            .append('circle')
+            .attr('r',schoolUnivCircle)
+            .attr('cx',0)
+            .attr('cy',0)
+            .attr('stroke','black')
+            .attr('stroke-width','4')
+            .attr('fill','transparent')
+
+            bejaia
+            .append("circle")
+            .attr("r", 30)
+            .attr("cx",0)
+            .attr("cy",0)
+            .attr("fill","black")
+
+            bejaia
+            .append('text')
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("dy", ".35em")
+            .attr('stroke',"white")
+            .attr("font-size", "12")
+            .attr("text-anchor", "middle")
+            .text('Bejaia')
                     
     
         
