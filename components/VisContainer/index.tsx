@@ -132,31 +132,28 @@ const VisContainer = ({styles:s}:PropType)=>{
          const centeralCirclePadding = 10;
 
          const randomCircle = ()=>{
-            const radialCoord:any = {
-                r:30+centeralCirclePadding+Math.floor(Math.random()*(schoolUnivCircle-30-centeralCirclePadding)),
-                theta:Math.random()*2*Math.PI
-             };
-            const x = radialCoord.r*Math.cos(radialCoord.theta);
-            const y = -radialCoord.r*Math.sin(radialCoord.theta);
-            circles.forEach(c=>{
-                
+          
+             const r = 30+centeralCirclePadding+Math.floor(Math.random()*(schoolUnivCircle-30-centeralCirclePadding));
+             const theta = Math.random()*2*Math.PI;
+             let x = r*Math.cos(theta);
+             let y = -r*Math.sin(theta);
+             for(let i=0;i<circles.length;i++){
+                const c = circles[i];
                 const dxPow = Math.pow( x -c.x,2) 
                 const dyPow = Math.pow( y -c.y,2) 
                 const distance = Math.sqrt(dxPow + dyPow);
-                if(distance < c.r +radialCoord.r){
+                if(distance < c.r +r){
                     randomCircle();
-                
+                    break;
                 }
-                
-            })
+             }
+            
             const circle = {
                 x,
                 y,
-                r:radialCoord.r
+                r
             }
             circles.push(circle)
-       
-           
     }
         fromS.forEach(_=>{
             randomCircle()
