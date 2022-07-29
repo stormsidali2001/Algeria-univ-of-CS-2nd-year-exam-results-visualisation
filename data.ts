@@ -1,4 +1,11 @@
-export const data = JSON.parse(`[
+ interface DataElement {
+  Origine:string;
+  Classement:string;
+  Affectation:string;
+}
+
+
+export const data:DataElement[] = JSON.parse(`[
     {
       "Origine": "A",
       "Classement": 119,

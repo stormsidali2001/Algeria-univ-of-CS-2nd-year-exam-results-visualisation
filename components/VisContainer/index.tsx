@@ -1,11 +1,12 @@
 import { CSSProperties, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import styles from './VisContainer.module.css';
-import * as d3 from 'd3'
+import * as d3 from 'd3';
+import {data} from '../../data'
 interface PropType{
     styles:CSSProperties;
 }
 const VisContainer = ({styles:s}:PropType)=>{
-    const data = [];
+
     const [runOnce,setRunOnce] = useState(false);
 
   
@@ -14,6 +15,23 @@ const VisContainer = ({styles:s}:PropType)=>{
 
     }
     useLayoutEffect(()=>{
+        const fromA: { Classement: string; Affectation: string; }[] = [];
+        const fromB: { Classement: string; Affectation: string; }[] = [];
+        const fromS: { Classement: string; Affectation: string; }[] = [];
+        data.forEach(({Origine,...others})=>{
+            switch(Origine){
+                case 'A':
+                    fromA.push({...others})
+                    break;
+                case 'B':
+                    fromB.push({...others})
+                    break;
+                case 'S':
+                    fromS.push({...others})
+                    break;
+            }
+        })  
+        console.log(fromA,fromB,fromS)
         if(runOnce) return;
         const {width,height} = (containerRef.current as unknown as HTMLElement).getBoundingClientRect();
       
@@ -111,7 +129,26 @@ const VisContainer = ({styles:s}:PropType)=>{
             .attr("text-anchor", "middle")
             .text('Bejaia')
                     
-    
+         //working with the dataset
+         const randoms: { r: number;theta:number }[] = [];
+         const centeralCirclePadding = 20;
+         sba.selectAll('data-sba-circle').data(fromS)
+         .enter()
+         .append("circle")
+         .attr("class","data-sba-circle")
+         .attr("r", 2)
+         .attr("cx",(_,i)=>{
+            randoms[i] = {
+                r:30+centeralCirclePadding+Math.floor(Math.random()*(schoolUnivCircle-30-centeralCirclePadding)),
+                theta:Math.random()*2*Math.PI
+            };
+           
+            return randoms[i].r*Math.cos(randoms[i].theta)
+        })
+         .attr("cy",(_,i)=>{
+            return -randoms[i].r*Math.sin(randoms[i].theta)
+        })
+         .attr("fill","black")
         
         console.log(width,height,runOnce)
 
