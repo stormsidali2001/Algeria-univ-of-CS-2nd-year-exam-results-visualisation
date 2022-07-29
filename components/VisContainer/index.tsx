@@ -11,9 +11,7 @@ const VisContainer = ({styles:s}:PropType)=>{
 
   
     const containerRef = useRef(null);
-    const getCircleStyle = ()=>{
-
-    }
+   
     useLayoutEffect(()=>{
         const fromA: { Classement: string; Affectation: string; }[] = [];
         const fromB: { Classement: string; Affectation: string; }[] = [];
@@ -41,7 +39,7 @@ const VisContainer = ({styles:s}:PropType)=>{
                     .attr('width',width)
                     .attr('height',height);
         const svgRadius = (Math.sqrt(Math.pow(width,2) + Math.pow(height,2)))/2;
-        const schoolUnivCircle = Math.floor(svgRadius*0.3) ;
+        const schoolUnivCircle = Math.floor((svgRadius-70)/3 ) ;
         const padding = 20;
 
         const sba = svg.append('g')
@@ -131,24 +129,60 @@ const VisContainer = ({styles:s}:PropType)=>{
                     
          //working with the dataset
          const randoms: { r: number;theta:number }[] = [];
-         const centeralCirclePadding = 20;
-         sba.selectAll('data-sba-circle').data(fromS)
-         .enter()
-         .append("circle")
-         .attr("class","data-sba-circle")
-         .attr("r", 2)
-         .attr("cx",(_,i)=>{
-            randoms[i] = {
+         const circles: {x:number,y:number,r:number}[] = []
+         const centeralCirclePadding = 10;
+
+         const randomCircle = ()=>{
+            const radialCoord:any = {
                 r:30+centeralCirclePadding+Math.floor(Math.random()*(schoolUnivCircle-30-centeralCirclePadding)),
                 theta:Math.random()*2*Math.PI
-            };
+             };
+            const x = radialCoord.r*Math.cos(radialCoord.theta);
+            const y = -radialCoord.r*Math.sin(radialCoord.theta);
+            circles.forEach(c=>{
+                
+                const dxPow = Math.pow( x -c.x,2) 
+                const dyPow = Math.pow( y -c.y,2) 
+                const distance = Math.sqrt(dxPow + dyPow);
+                if(distance < c.r +radialCoord.r){
+                    randomCircle();
+                
+                }
+                
+            })
+            const circle = {
+                x,
+                y,
+                r:radialCoord.r
+            }
+            circles.push(circle)
+       
            
-            return randoms[i].r*Math.cos(randoms[i].theta)
+    }
+        fromS.forEach(_=>{
+            randomCircle()
         })
-         .attr("cy",(_,i)=>{
-            return -randoms[i].r*Math.sin(randoms[i].theta)
-        })
-         .attr("fill","black")
+        console.log(circles)
+
+        //  sba.selectAll('data-sba-circle').data(fromS)
+        //  .enter()
+        //  .append("circle")
+        //  .attr("class","data-sba-circle")
+        //  .attr("r", d=>{
+        //     const score = data.length - +d.Classement;
+        //     return (score )/(data.length )*4+2;
+        //  })
+        //  .attr("cx",(_,i)=>{
+         
+          
+           
+        //     return circles[i].x
+        // })
+        //  .attr("cy",(_,i)=>{
+        //     return circles[i].y
+        // })
+        //  .attr("fill","transparent")
+        //  .attr('stroke','black')
         
         console.log(width,height,runOnce)
 
