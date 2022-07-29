@@ -114,6 +114,8 @@ const VisContainer = ({styles:s}:PropType)=>{
     
         
         console.log(width,height,runOnce)
+
+        
        
         setRunOnce(true)
 
