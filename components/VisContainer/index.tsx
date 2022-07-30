@@ -9,9 +9,9 @@ const VisContainer = ({styles:s}:PropType)=>{
 
     const [runOnce,setRunOnce] = useState(false);
 
-  
+
     const containerRef = useRef(null);
-   
+
     useLayoutEffect(()=>{
         const fromA: { Classement: string; Affectation: string; }[] = [];
         const fromB: { Classement: string; Affectation: string; }[] = [];
@@ -28,27 +28,30 @@ const VisContainer = ({styles:s}:PropType)=>{
                     fromS.push({...others})
                     break;
             }
-        })  
+        })
         if(runOnce) return;
         const {width,height} = (containerRef.current as unknown as HTMLElement).getBoundingClientRect();
-      
-     
+        const padding = 20;
+        const rectW = (width- padding*2)/3;
+        const rectH =  height - padding*2;
 
         const svg = d3.select(containerRef.current).append('svg')
                     .attr('width',width)
                     .attr('height',height);
         const svgRadius = (Math.sqrt(Math.pow(width,2) + Math.pow(height,2)))/2;
         const schoolUnivCircle = Math.floor((svgRadius-70)/3 ) ;
-        const padding = 20;
+
 
         const sba = svg.append('g')
-                    .attr('transform',`translate(${ schoolUnivCircle+padding},${0+schoolUnivCircle+padding})`)
-                    
+                    .attr('transform',`translate(${ rectW/2+padding},${rectH/2+padding})`)
+
                sba
-               .append('circle')
-               .attr('r',schoolUnivCircle)
-               .attr('cx',0)
-               .attr('cy',0)
+               .append('rect')
+               .attr('width',rectW)
+               .attr('height',rectH)
+               .attr('transform',`translate(${-rectW/2},${-rectH/2})`)
+               .attr('x',0)
+               .attr('y',0)
                .attr('stroke','black')
                .attr('stroke-width','4')
                .attr('fill','transparent')
@@ -68,15 +71,17 @@ const VisContainer = ({styles:s}:PropType)=>{
                 .attr("font-size", "14")
                 .attr("text-anchor", "middle")
                 .text('Sba')
-               
+
 
         const algeirs = svg.append('g')
-                        .attr('transform',`translate(${ width - schoolUnivCircle -padding},${schoolUnivCircle+padding})`);
+                        .attr('transform',`translate(${ width - rectW/2 -padding},${rectH/2+padding})`);
             algeirs
-            .append('circle')
-            .attr('r',schoolUnivCircle)
-            .attr('cx',0)
-            .attr('cy',0)
+            .append('rect')
+            .attr('width',rectW)
+            .attr('height',rectH)
+            .attr('transform',`translate(${-rectW/2},${-rectH/2})`)
+            .attr('x',0)
+            .attr('y',0)
             .attr('stroke','black')
             .attr('stroke-width','4')
             .attr('fill','transparent')
@@ -99,12 +104,14 @@ const VisContainer = ({styles:s}:PropType)=>{
             .text('Algeirs')
 
             const bejaia = svg.append('g')
-            .attr('transform',`translate(${ width/2 },${height -schoolUnivCircle - padding})`);
+            .attr('transform',`translate(${ width/2 },${height -rectH/2 - padding})`);
             bejaia
-            .append('circle')
-            .attr('r',schoolUnivCircle)
-            .attr('cx',0)
-            .attr('cy',0)
+            .append('rect')
+            .attr('width',rectW)
+            .attr('height',rectH)
+            .attr('transform',`translate(${-rectW/2},${-rectH/2})`)
+            .attr('x',0)
+            .attr('y',0)
             .attr('stroke','black')
             .attr('stroke-width','4')
             .attr('fill','transparent')
@@ -125,40 +132,51 @@ const VisContainer = ({styles:s}:PropType)=>{
             .attr("font-size", "12")
             .attr("text-anchor", "middle")
             .text('Bejaia')
-                    
-         //working with the dataset
-         const randoms: { r: number;theta:number }[] = [];
-         const circles: {x:number,y:number,r:number}[] = []
-         const centeralCirclePadding = 10;
 
-         const randomCircle = ()=>{
-          
-             const r = 30+centeralCirclePadding+Math.floor(Math.random()*(schoolUnivCircle-30-centeralCirclePadding));
-             const theta = Math.random()*2*Math.PI;
-             let x = r*Math.cos(theta);
-             let y = -r*Math.sin(theta);
-             for(let i=0;i<circles.length;i++){
-                const c = circles[i];
-                const dxPow = Math.pow( x -c.x,2) 
-                const dyPow = Math.pow( y -c.y,2) 
-                const distance = Math.sqrt(dxPow + dyPow);
-                if(distance < c.r +r){
-                    randomCircle();
-                    break;
+         //working with the dataset
+
+         const centeralCirclePadding = 10;
+        
+        class Grid{
+            private grid:number[] = [];
+            private rows:number;
+            private cols:number;
+            constructor(rows:number,cols:number){
+                this.rows = rows;
+                this.cols = cols;
+                for(let i=0;i<this.rows*this.cols;i++){
+                    this.grid[i] = -1;
                 }
-             }
-            
-            const circle = {
-                x,
-                y,
-                r
+
             }
-            circles.push(circle)
-    }
-        fromS.forEach(_=>{
-            randomCircle()
-        })
-        console.log(circles)
+            at(i:number,j:Number){
+                if(i<0 || i>=this.rows || j<0 || j>=this.cols){
+                    throw new Error("index out of bounds");
+                }
+                return this.grid[i*this.cols +this.rows]
+            }
+            toString(){
+                let s = '';
+                for(let i=0;i<this.rows;i++){
+                    for(let j=0;j<this.cols;j++){
+                        s += this.grid[i*cols +j]+ ' ';
+                    }
+                    s+=`
+                    `;
+                }
+                return s;
+            }
+        }
+        const r = 10;
+        const k = 30;
+        const w = r / Math.sqrt(2);
+        
+        const rows = Math.floor(rectH/w);
+        const cols = Math.floor(rectW/w);
+        const grid = new Grid(rows,cols)
+        console.log(grid)
+      
+
 
         //  sba.selectAll('data-sba-circle').data(fromS)
         //  .enter()
@@ -169,9 +187,9 @@ const VisContainer = ({styles:s}:PropType)=>{
         //     return (score )/(data.length )*4+2;
         //  })
         //  .attr("cx",(_,i)=>{
-         
-          
-           
+
+
+
         //     return circles[i].x
         // })
         //  .attr("cy",(_,i)=>{
@@ -179,11 +197,11 @@ const VisContainer = ({styles:s}:PropType)=>{
         // })
         //  .attr("fill","transparent")
         //  .attr('stroke','black')
-        
+
         console.log(width,height,runOnce)
 
-        
-       
+
+
         setRunOnce(true)
 
 
@@ -199,7 +217,7 @@ const VisContainer = ({styles:s}:PropType)=>{
             height:s.height?s.height:'100%',
             ...s
         }}>
-         
+
         </div>
     )
 }
