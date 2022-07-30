@@ -83,6 +83,16 @@ const VisContainer = ({styles:s}:PropType)=>{
                 .attr("text-anchor", "middle")
                 .text('Sba')
 
+                sba
+                .append('text')
+                .attr("x", 0)
+                .attr("y", -rectH/2+20)
+                .attr("dy", ".35em")
+                .attr('stroke',"black")
+                .attr("font-size", "14")
+                .attr("text-anchor", "middle")
+                .text('Score: '+Math.floor(scoreS))
+
 
         const algeirs = svg.append('g')
                         .attr('transform',`translate(${ width - rectW/2 },${rectH/2})`);
@@ -114,6 +124,16 @@ const VisContainer = ({styles:s}:PropType)=>{
             .attr("text-anchor", "middle")
             .text('Algeirs')
 
+            algeirs
+            .append('text')
+            .attr("x", 0)
+            .attr("y", -rectH/2+20)
+            .attr("dy", ".35em")
+            .attr('stroke',"black")
+            .attr("font-size", "14")
+            .attr("text-anchor", "middle")
+            .text('Score: '+Math.floor(scoreA))
+
             const bejaia = svg.append('g')
             .attr('transform',`translate(${ width/2 },${height -rectH/2 })`);
             bejaia
@@ -143,6 +163,17 @@ const VisContainer = ({styles:s}:PropType)=>{
             .attr("font-size", "12")
             .attr("text-anchor", "middle")
             .text('Bejaia')
+
+            bejaia
+            .append('text')
+            .attr("x", 0)
+            .attr("y", -rectH/2+20)
+            .attr("dy", ".35em")
+            .attr('stroke',"black")
+            .attr("font-size", "14")
+            .attr("text-anchor", "middle")
+            .text('Score: '+Math.floor(scoreB))
+
 
          //working with the dataset
 
@@ -234,7 +265,7 @@ const VisContainer = ({styles:s}:PropType)=>{
          .attr("class","data-sba-circle")
          .attr("r", d=>{
             const score = data.length - +d.Classement;
-            return (score )/(data.length )*6+1;
+            return (score )/(data.length )*6+2;
         })
         //@ts-ignore
          .attr("cx",(_,i)=>{
@@ -273,7 +304,7 @@ const VisContainer = ({styles:s}:PropType)=>{
          .attr("class","data-algeirs-circle")
          .attr("r", d=>{
             const score = data.length - +d.Classement;
-            return (score )/(data.length )*6+1;
+            return (score )/(data.length )*6+2;
         })
         //@ts-ignore
          .attr("cx",(_,i)=>{
@@ -312,7 +343,7 @@ const VisContainer = ({styles:s}:PropType)=>{
          .attr("class","data-bejaia-circle")
          .attr("r", d=>{
             const score = data.length - +d.Classement;
-            return (score )/(data.length )*6+1;
+            return (score )/(data.length )*6+2;
         })
         //@ts-ignore
          .attr("cx",(_,i)=>{
@@ -341,6 +372,10 @@ const VisContainer = ({styles:s}:PropType)=>{
             return color;
          })
          .attr('stroke','black')
+         .on('mouseover',function (e,d){
+            d3.select(this)
+            
+         })
 
         console.log(width,height,runOnce)
 
