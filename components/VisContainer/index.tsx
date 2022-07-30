@@ -16,35 +16,45 @@ const VisContainer = ({styles:s}:PropType)=>{
         const fromA: { Classement: string; Affectation: string; }[] = [];
         const fromB: { Classement: string; Affectation: string; }[] = [];
         const fromS: { Classement: string; Affectation: string; }[] = [];
+        let scoreA = 0;
+        let scoreB = 0;
+        let scoreS = 0;
+
         data.forEach(({Origine,...others})=>{
             switch(Origine){
                 case 'A':
-                    fromA.push({...others})
+                    fromA.push({...others});
+                    let score = data.length - +others.Classement;
+                    scoreA += (score )/(data.length )*6+1;
                     break;
                 case 'B':
                     fromB.push({...others})
+                    score = data.length - +others.Classement;
+                    scoreB += (score )/(data.length )*6+1;
                     break;
                 case 'S':
                     fromS.push({...others})
+                    score = data.length - +others.Classement;
+                    scoreS += (score )/(data.length )*6+1;
                     break;
             }
         })
+        console.log(`scoreS: ${scoreS} scoreB: ${scoreB} scoreA: ${scoreA}`)
+
+
         if(runOnce) return;
         const {width,height} = (containerRef.current as unknown as HTMLElement).getBoundingClientRect();
         const padding = 20;
-        const rectW = (width- padding*2)/3;
-        const rectH =  height - padding*2;
+        const rectW = (width)/3;
+        const rectH =  height ;
 
         const svg = d3.select(containerRef.current).append('svg')
                     .attr('width',width)
                     .attr('height',height);
-        const svgRadius = (Math.sqrt(Math.pow(width,2) + Math.pow(height,2)))/2;
-        const schoolUnivCircle = Math.floor((svgRadius-70)/3 ) ;
 
 
-        const sbaLeftPoint = {x:padding,y:padding}
         const sba = svg.append('g')
-                    .attr('transform',`translate(${ rectW/2+padding},${rectH/2+padding})`)
+                    .attr('transform',`translate(${ rectW/2},${rectH/2})`)
 
                sba
                .append('rect')
@@ -74,9 +84,8 @@ const VisContainer = ({styles:s}:PropType)=>{
                 .text('Sba')
 
 
-        const algeiersLeftPoint = {x:padding + 2*rectW,y:padding}
         const algeirs = svg.append('g')
-                        .attr('transform',`translate(${ width - rectW/2 -padding},${rectH/2+padding})`);
+                        .attr('transform',`translate(${ width - rectW/2 },${rectH/2})`);
             algeirs
             .append('rect')
             .attr('width',rectW)
@@ -105,9 +114,8 @@ const VisContainer = ({styles:s}:PropType)=>{
             .attr("text-anchor", "middle")
             .text('Algeirs')
 
-            const bejaiaLeftPoint = {x:padding+rectW,y:padding}
             const bejaia = svg.append('g')
-            .attr('transform',`translate(${ width/2 },${height -rectH/2 - padding})`);
+            .attr('transform',`translate(${ width/2 },${height -rectH/2 })`);
             bejaia
             .append('rect')
             .attr('width',rectW)
@@ -138,7 +146,6 @@ const VisContainer = ({styles:s}:PropType)=>{
 
          //working with the dataset
 
-         const centeralCirclePadding = 10;
         
     
         const active:{x:number,y:number}[] = []
@@ -147,12 +154,12 @@ const VisContainer = ({styles:s}:PropType)=>{
             if(floor) res = Math.floor(res);
             return res;
         }
-        const r = 18;
+        const r = 17;
         const k = 30;
         const w = r / Math.sqrt(2);
         
-        const rows = Math.floor((rectH-padding)/w);
-        const cols = Math.floor((rectW-padding)/w);
+        const rows = Math.floor((rectH-70)/w);
+        const cols = Math.floor((rectW-70)/w);
         const grid:({x:number,y:number} |undefined)[] = []
         for(let i = 0;i<rows*cols;i++){
             grid[i] = undefined;
@@ -186,20 +193,20 @@ const VisContainer = ({styles:s}:PropType)=>{
                 const dist = (obj1:{x:number,y:number},obj2:{x:number,y:number})=>{
                     return Math.hypot(obj1.x-obj2.x,obj1.y-obj2.y)
                 }
-                if (col > -2 && row > -2 && col < cols && row < rows && !grid[row*cols +col]) {
-                        var ok = true;
-                        for (var i = -2; i <= 2; i++) {
-                            for (var j = -2; j <= 2; j++) {
+                if (col > -3 && row > -3 && col < cols && row < rows && !grid[row*cols +col]) {
+                        var neighborExist = false;
+                        for (var i = -3; i <= 3; i++) {
+                            for (var j = -3; j <= 3; j++) {
                                     var neighbor = grid[(row+j)*cols +col+i];
                                     if (neighbor) {
                                         var d = dist(sample, neighbor);
                                         if (d < r) {
-                                            ok = false;
+                                            neighborExist = true;
                                         }
                                     }
                             }
                         }
-                        if (ok) {
+                        if (!neighborExist) {
                             found = true;
                             grid[row*cols +col] = sample
                          
@@ -217,7 +224,8 @@ const VisContainer = ({styles:s}:PropType)=>{
 
     
 
-        const filledGrid = grid.filter(el=>el)
+        let filledGrid = grid.filter(el=>el)
+        filledGrid = filledGrid.sort((a,b)=>Math.random()-0.5)
         console.log(filledGrid,filledGrid.length,fromS.length)
 
          sba.selectAll('data-sba-circle').data(fromS)
@@ -226,20 +234,112 @@ const VisContainer = ({styles:s}:PropType)=>{
          .attr("class","data-sba-circle")
          .attr("r", d=>{
             const score = data.length - +d.Classement;
-            return (score )/(data.length )*6+2;
+            return (score )/(data.length )*6+1;
         })
         //@ts-ignore
          .attr("cx",(_,i)=>{
-//@ts-ignore
-            return sbaLeftPoint.x+filledGrid[i]?.x -rectW/2
+        //@ts-ignore
+            return 40 +filledGrid[i]?.x -rectW/2
         })
         //@ts-ignore
          .attr("cy",(_,i)=>{
 
             //@ts-ignore
-            return sbaLeftPoint.y +  filledGrid[i]?.y  -rectH/2
+            return 40+  filledGrid[i]?.y  -rectH/2
         })
-         .attr("fill","transparent")
+        .attr("fill",d=>{
+            const score = data.length - +d.Classement;
+            const ratio =  (score )/(data.length );
+            let color;
+            if(ratio < 0.25){
+                color = 'green';
+            }
+            else if(ratio <0.75){
+                color = 'yellow';
+            }
+            else{
+                color = 'red';
+            }
+            return color;
+         })
+         .attr('stroke','black')
+
+
+
+         filledGrid = filledGrid.sort((a,b)=>Math.random()-0.5)
+         algeirs.selectAll('data-algeirs-circle').data(fromA)
+         .enter()
+         .append("circle")
+         .attr("class","data-algeirs-circle")
+         .attr("r", d=>{
+            const score = data.length - +d.Classement;
+            return (score )/(data.length )*6+1;
+        })
+        //@ts-ignore
+         .attr("cx",(_,i)=>{
+        //@ts-ignore
+            return 40+ filledGrid[i]?.x -rectW/2
+        })
+        //@ts-ignore
+         .attr("cy",(_,i)=>{
+
+            //@ts-ignore
+            return  40+ filledGrid[i]?.y  -rectH/2
+        })
+        .attr("fill",d=>{
+            const score = data.length - +d.Classement;
+            const ratio =  (score )/(data.length );
+            let color;
+            if(ratio < 0.25){
+                color = 'green';
+            }
+            else if(ratio <0.75){
+                color = 'yellow';
+            }
+            else{
+                color = 'red';
+            }
+            return color;
+         })
+         .attr('stroke','black')
+
+         filledGrid = filledGrid.sort((a,b)=>Math.random()-0.5)
+
+
+         bejaia.selectAll('data-bejaia-circle').data(fromB)
+         .enter()
+         .append("circle")
+         .attr("class","data-bejaia-circle")
+         .attr("r", d=>{
+            const score = data.length - +d.Classement;
+            return (score )/(data.length )*6+1;
+        })
+        //@ts-ignore
+         .attr("cx",(_,i)=>{
+        //@ts-ignore
+            return 40+ filledGrid[i]?.x -rectW/2
+        })
+        //@ts-ignore
+         .attr("cy",(_,i)=>{
+
+            //@ts-ignore
+            return  40+ filledGrid[i]?.y  -rectH/2
+        })
+         .attr("fill",d=>{
+            const score = data.length - +d.Classement;
+            const ratio =  (score )/(data.length );
+            let color;
+            if(ratio < 0.25){
+                color = 'green';
+            }
+            else if(ratio <0.75){
+                color = 'yellow';
+            }
+            else{
+                color = 'red';
+            }
+            return color;
+         })
          .attr('stroke','black')
 
         console.log(width,height,runOnce)
