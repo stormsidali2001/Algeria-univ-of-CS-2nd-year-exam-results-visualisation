@@ -155,6 +155,7 @@ const VisContainer = ({styles:s}:PropType)=>{
             }
             at(i:number,j:Number){
                 if(i<0 || i>=this.rows || j<0 || j>=this.cols){
+                      console.log(i,j,'indexes')
                     throw new Error("index out of bounds");
                 }
                 return this.grid[i*this.cols +this.rows]
@@ -162,6 +163,7 @@ const VisContainer = ({styles:s}:PropType)=>{
             set(i:number,j:Number,value:(number | {x:number,y:number})){
                 if(i<0 || i>=this.rows || j<0 || j>=this.cols){
 
+                    console.log(i,j,'indexes')
                     throw new Error(`index out of bounds i = ${i} j= ${j}`);
                 }
 
@@ -179,6 +181,17 @@ const VisContainer = ({styles:s}:PropType)=>{
                 }
                 return s;
             }
+            count(){
+                let c:number = 0;
+               this.grid.forEach((el)=>{
+                if(el !==-1) c++;
+               })
+               return c;
+            }
+            inBounds(i:number,j:number){
+                if(i<0 || i>=this.rows || j<0 || j>=this.cols) return false;
+                return true;
+            }
         }
         const active:{x:number,y:number}[] = []
         function random(min:number,max:number,floor:boolean = true){
@@ -186,7 +199,7 @@ const VisContainer = ({styles:s}:PropType)=>{
             if(floor) res = Math.floor(res);
             return res;
         }
-        const r = 10;
+        const r = 50;
         const k = 30;
         const w = r / Math.sqrt(2);
         
@@ -198,47 +211,71 @@ const VisContainer = ({styles:s}:PropType)=>{
         let x = random(0,rectW)
         let y = random(0,rectH)
 
-        const rp = {x,y};
-        console.log(rp)
-        active.push(rp);
+        const X0 = {x,y};
+
+      
+      
         grid.set(
             Math.floor(y/w),
             Math.floor(x/w),
-            rp
+            X0
         )
+        active.push(X0);
         while(active.length >0){
+            console.log('it')
             const randomIndex = Math.floor(Math.random()*active.length);
             const point = active[randomIndex];
+            let found = false;
+            console.log('base point: ',point)
             for(let t = 0;t<k;t++){
-                const randomRadius = random(r,2*r);
-                const randomAngle = random(0,Math.PI*2);
-                const x = point.x + Math.cos(randomAngle);
-                const y = point.y - Math.sin(randomAngle);
-                const col =  Math.floor(x/w)
-                const row = Math.floor(y/w)
-                let found = false;
-                for(let i=-1;i<=1 && !found;i++){
-                    for(let j=-1;j<=1 && !found;j++){
-                        if(grid.at(row,col)!== -1){
-                            const neighbor = grid.at(row,col) as {x:number,y:number} ;
-                            const dist = Math.hypot(neighbor.x -x,neighbor.y - y);
-                            if(dist < randomRadius){
-                                found = true;
-                            }
-
+                
+                let randomRadius = random(r,2*r);
+                let randomAngle = random(0,Math.PI*2);
+                let x = point.x + randomRadius*Math.cos(randomAngle);
+                let y = point.y - randomRadius*Math.sin(randomAngle);
+                let col =  Math.floor(x/w)
+                let row = Math.floor(y/w)
+              
+            
+                let neighborExist = false;
+                if(grid.inBounds(row,col)){
+                    
+                    for(let i=-1;i<=1 && !neighborExist;i++){
+                        for(let j=-1;j<=1 && !neighborExist;j++){
+                          
+                                    const neighbor = grid.at(row+i,col+j) as {x:number,y:number} ;
+                                    //@ts-ignore
+                                    if(grid.inBounds(row+i,col+j)&&neighbor != -1 ){
+                                        const dist = Math.hypot(neighbor.x -x,neighbor.y - y);
+                                        if(dist < r){
+                                            neighborExist = true;
+                                        }
+            
+                                    }
+                            
+    
+    
                         }
-
-
                     }
-                }
-                if(!found){
-                    active.push({x,y});
-                }
 
+                    if(!neighborExist){
+                        console.log("set",grid.inBounds(row,col),row,col)
+                        active.push({x,y});
+                        grid.set(row,col,{x,y})
+                        found = true;
+                    }
+
+                }
+              
+               
+
+            }
+            if(!found){
+                 active.splice(randomIndex,1)
             }
         }
 
-        
+        console.log(grid.count(),active)
 
 
 
