@@ -42,6 +42,7 @@ const VisContainer = ({styles:s}:PropType)=>{
         const schoolUnivCircle = Math.floor((svgRadius-70)/3 ) ;
 
 
+        const sbaLeftPoint = {x:padding,y:padding}
         const sba = svg.append('g')
                     .attr('transform',`translate(${ rectW/2+padding},${rectH/2+padding})`)
 
@@ -73,6 +74,7 @@ const VisContainer = ({styles:s}:PropType)=>{
                 .text('Sba')
 
 
+        const algeiersLeftPoint = {x:padding + 2*rectW,y:padding}
         const algeirs = svg.append('g')
                         .attr('transform',`translate(${ width - rectW/2 -padding},${rectH/2+padding})`);
             algeirs
@@ -103,6 +105,7 @@ const VisContainer = ({styles:s}:PropType)=>{
             .attr("text-anchor", "middle")
             .text('Algeirs')
 
+            const bejaiaLeftPoint = {x:padding+rectW,y:padding}
             const bejaia = svg.append('g')
             .attr('transform',`translate(${ width/2 },${height -rectH/2 - padding})`);
             bejaia
@@ -138,7 +141,8 @@ const VisContainer = ({styles:s}:PropType)=>{
          const centeralCirclePadding = 10;
         
         class Grid{
-            private grid:number[] = [];
+           
+            private grid: (number | {x:number,y:number})[] = [];
             private rows:number;
             private cols:number;
             constructor(rows:number,cols:number){
@@ -155,6 +159,14 @@ const VisContainer = ({styles:s}:PropType)=>{
                 }
                 return this.grid[i*this.cols +this.rows]
             }
+            set(i:number,j:Number,value:(number | {x:number,y:number})){
+                if(i<0 || i>=this.rows || j<0 || j>=this.cols){
+
+                    throw new Error(`index out of bounds i = ${i} j= ${j}`);
+                }
+
+                 this.grid[i*this.cols +this.rows] = value;
+            }
             toString(){
                 let s = '';
                 for(let i=0;i<this.rows;i++){
@@ -167,6 +179,12 @@ const VisContainer = ({styles:s}:PropType)=>{
                 return s;
             }
         }
+        const active = []
+        function random(min:number,max:number,floor:boolean = true){
+            let res =  Math.random()*(max-min)+min;
+            if(floor) res = Math.floor(res);
+            return res;
+        }
         const r = 10;
         const k = 30;
         const w = r / Math.sqrt(2);
@@ -175,7 +193,20 @@ const VisContainer = ({styles:s}:PropType)=>{
         const cols = Math.floor(rectW/w);
         const grid = new Grid(rows,cols)
         console.log(grid)
-      
+        
+        let x = random(algeiersLeftPoint.x,algeiersLeftPoint.x+rectW)
+        let y = random(algeiersLeftPoint.y,algeiersLeftPoint.y+rectH)
+
+        const rp = {x,y};
+        active.push(rp);
+        grid.set(
+            Math.floor(y/w),
+            Math.floor(x/w),
+            rp
+        )
+
+        
+
 
 
         //  sba.selectAll('data-sba-circle').data(fromS)
