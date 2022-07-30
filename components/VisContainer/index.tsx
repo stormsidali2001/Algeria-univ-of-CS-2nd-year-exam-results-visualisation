@@ -140,164 +140,107 @@ const VisContainer = ({styles:s}:PropType)=>{
 
          const centeralCirclePadding = 10;
         
-        class Grid{
-           
-            private grid: (number | {x:number,y:number})[] = [];
-            private rows:number;
-            private cols:number;
-            constructor(rows:number,cols:number){
-                this.rows = rows;
-                this.cols = cols;
-                for(let i=0;i<this.rows*this.cols;i++){
-                    this.grid[i] = -1;
-                }
-
-            }
-            at(i:number,j:Number){
-                if(i<0 || i>=this.rows || j<0 || j>=this.cols){
-                      console.log(i,j,'indexes')
-                    throw new Error("index out of bounds");
-                }
-                return this.grid[i*this.cols +this.rows]
-            }
-            set(i:number,j:Number,value:(number | {x:number,y:number})){
-                if(i<0 || i>=this.rows || j<0 || j>=this.cols){
-
-                    console.log(i,j,'indexes')
-                    throw new Error(`index out of bounds i = ${i} j= ${j}`);
-                }
-
-                 this.grid[i*this.cols +this.rows] = value;
-            }
-            toString(){
-                let s = '';
-                for(let i=0;i<this.rows;i++){
-                    for(let j=0;j<this.cols;j++){
-                      
-                        s += this.grid[i*cols +j]+ ' ';
-                    }
-                    s+=`
-                    `;
-                }
-                return s;
-            }
-            count(){
-                let c:number = 0;
-               this.grid.forEach((el)=>{
-                if(el !==-1) c++;
-               })
-               return c;
-            }
-            inBounds(i:number,j:number){
-                if(i<0 || i>=this.rows || j<0 || j>=this.cols) return false;
-                return true;
-            }
-        }
+    
         const active:{x:number,y:number}[] = []
         function random(min:number,max:number,floor:boolean = true){
             let res =  Math.random()*(max-min)+min;
             if(floor) res = Math.floor(res);
             return res;
         }
-        const r = 50;
+        const r = 18;
         const k = 30;
         const w = r / Math.sqrt(2);
         
-        const rows = Math.floor(rectH/w);
-        const cols = Math.floor(rectW/w);
-        const grid = new Grid(rows,cols)
-        console.log(grid)
-        
-        let x = random(0,rectW)
-        let y = random(0,rectH)
+        const rows = Math.floor((rectH-padding)/w);
+        const cols = Math.floor((rectW-padding)/w);
+        const grid:({x:number,y:number} |undefined)[] = []
+        for(let i = 0;i<rows*cols;i++){
+            grid[i] = undefined;
+        }
+        let x = rectW/2
+        let y = rectH/2
+        const col = Math.floor(y/w);
+        const row =  Math.floor(x/w);
 
         const X0 = {x,y};
 
       
-      
-        grid.set(
-            Math.floor(y/w),
-            Math.floor(x/w),
-            X0
-        )
+        grid[row*cols +col] = X0;
         active.push(X0);
         while(active.length >0){
-            console.log('it')
             const randomIndex = Math.floor(Math.random()*active.length);
             const point = active[randomIndex];
             let found = false;
-            console.log('base point: ',point)
             for(let t = 0;t<k;t++){
                 
                 let randomRadius = random(r,2*r);
                 let randomAngle = random(0,Math.PI*2);
-                let x = point.x + randomRadius*Math.cos(randomAngle);
-                let y = point.y - randomRadius*Math.sin(randomAngle);
-                let col =  Math.floor(x/w)
-                let row = Math.floor(y/w)
-              
+                const sample = {
+                    x:point.x + randomRadius*Math.cos(randomAngle),
+                    y:point.y - randomRadius*Math.sin(randomAngle)
+                };
+                let col =  Math.floor(sample.x/w)
+                let row = Math.floor(sample.y/w)
+                
             
-                let neighborExist = false;
-                if(grid.inBounds(row,col)){
-                    
-                    for(let i=-1;i<=1 && !neighborExist;i++){
-                        for(let j=-1;j<=1 && !neighborExist;j++){
-                          
-                                    const neighbor = grid.at(row+i,col+j) as {x:number,y:number} ;
-                                    //@ts-ignore
-                                    if(grid.inBounds(row+i,col+j)&&neighbor != -1 ){
-                                        const dist = Math.hypot(neighbor.x -x,neighbor.y - y);
-                                        if(dist < r){
-                                            neighborExist = true;
-                                        }
-            
-                                    }
-                            
-    
-    
-                        }
-                    }
-
-                    if(!neighborExist){
-                        console.log("set",grid.inBounds(row,col),row,col)
-                        active.push({x,y});
-                        grid.set(row,col,{x,y})
-                        found = true;
-                    }
-
+                const dist = (obj1:{x:number,y:number},obj2:{x:number,y:number})=>{
+                    return Math.hypot(obj1.x-obj2.x,obj1.y-obj2.y)
                 }
-              
+                if (col > -2 && row > -2 && col < cols && row < rows && !grid[row*cols +col]) {
+                        var ok = true;
+                        for (var i = -2; i <= 2; i++) {
+                            for (var j = -2; j <= 2; j++) {
+                                    var neighbor = grid[(row+j)*cols +col+i];
+                                    if (neighbor) {
+                                        var d = dist(sample, neighbor);
+                                        if (d < r) {
+                                            ok = false;
+                                        }
+                                    }
+                            }
+                        }
+                        if (ok) {
+                            found = true;
+                            grid[row*cols +col] = sample
+                         
+                            active.push(sample);
+                            break;
+                          }
                
-
+                }
             }
+        
             if(!found){
                  active.splice(randomIndex,1)
             }
         }
 
-        console.log(grid.count(),active)
+    
 
+        const filledGrid = grid.filter(el=>el)
+        console.log(filledGrid,filledGrid.length,fromS.length)
 
+         sba.selectAll('data-sba-circle').data(fromS)
+         .enter()
+         .append("circle")
+         .attr("class","data-sba-circle")
+         .attr("r", d=>{
+            const score = data.length - +d.Classement;
+            return (score )/(data.length )*6+2;
+        })
+        //@ts-ignore
+         .attr("cx",(_,i)=>{
+//@ts-ignore
+            return sbaLeftPoint.x+filledGrid[i]?.x -rectW/2
+        })
+        //@ts-ignore
+         .attr("cy",(_,i)=>{
 
-        //  sba.selectAll('data-sba-circle').data(fromS)
-        //  .enter()
-        //  .append("circle")
-        //  .attr("class","data-sba-circle")
-        //  .attr("r", d=>{
-        //     const score = data.length - +d.Classement;
-        //     return (score )/(data.length )*4+2;
-        //  })
-        //  .attr("cx",(_,i)=>{
-
-
-
-        //     return circles[i].x
-        // })
-        //  .attr("cy",(_,i)=>{
-        //     return circles[i].y
-        // })
-        //  .attr("fill","transparent")
-        //  .attr('stroke','black')
+            //@ts-ignore
+            return sbaLeftPoint.y +  filledGrid[i]?.y  -rectH/2
+        })
+         .attr("fill","transparent")
+         .attr('stroke','black')
 
         console.log(width,height,runOnce)
 
