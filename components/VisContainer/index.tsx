@@ -53,7 +53,7 @@ const VisContainer = ({styles:s}:PropType)=>{
             // .attr("text-anchor", "middle")
             // .text('score: '+score)
          }
-         function handleMouseLeave(e) {
+         function handleMouseLeave(e: { path: any[]; }) {
             console.log('leave', e.path[1])
             const parent = e.path[1];
 
