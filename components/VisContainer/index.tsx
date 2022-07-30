@@ -5,6 +5,7 @@ import {data} from '../../data'
 interface PropType{
     styles:CSSProperties;
 }
+
 const VisContainer = ({styles:s}:PropType)=>{
 
     const [runOnce,setRunOnce] = useState(false);
@@ -13,6 +14,52 @@ const VisContainer = ({styles:s}:PropType)=>{
     const containerRef = useRef(null);
 
     useLayoutEffect(()=>{
+        function handleMouseOver(e:any,d: { Classement: string | number; }){
+            //e.path contains all the ancestors
+            const parent = d3.select(e.path[1]);
+            console.log(e.path[1])
+            const target = d3.select(e.path[0])
+            const score = data.length - +d.Classement;
+            parent
+            .append('g')
+            .classed('removeableText', true)
+            .attr("transform",`translate(${+target.attr('cx')},${+target.attr('cy')-+target.attr('r')})`)
+            .append('rect')
+            .attr('fill',"black")
+            .attr('width',80)
+            .attr('height',20)
+            .attr('x',-80/2)
+            .attr('y',-20/2-10)
+            
+            parent.select('g')
+            .append('text')
+            .attr("x", 0)
+            .attr("y",-10)
+            .attr("dy", ".35em")
+            .attr('stroke',"white")
+            .attr("font-size", "13")
+            .attr("text-anchor", "middle")
+            .text('score: '+score)
+            
+
+
+            // .insert('text', ':last-child')
+            // .classed('removeableText', true)
+            // .attr("x", target.attr('cx'))
+            // .attr("y", +target.attr('cy')-+target.attr('r')-5)
+            // .attr("dy", ".35em")
+            // .attr('stroke',"black")
+            // .attr("font-size", "12")
+            // .attr("text-anchor", "middle")
+            // .text('score: '+score)
+         }
+         function handleMouseLeave(e) {
+            console.log('leave', e.path[1])
+            const parent = e.path[1];
+
+             d3.select(parent).selectAll('.removeableText').remove()
+          }
+       
         const fromA: { Classement: string; Affectation: string; }[] = [];
         const fromB: { Classement: string; Affectation: string; }[] = [];
         const fromS: { Classement: string; Affectation: string; }[] = [];
@@ -25,20 +72,23 @@ const VisContainer = ({styles:s}:PropType)=>{
                 case 'A':
                     fromA.push({...others});
                     let score = data.length - +others.Classement;
-                    scoreA += (score )/(data.length )*6+1;
+                    scoreA += score;
                     break;
                 case 'B':
                     fromB.push({...others})
                     score = data.length - +others.Classement;
-                    scoreB += (score )/(data.length )*6+1;
+                    scoreB += score;
                     break;
                 case 'S':
                     fromS.push({...others})
                     score = data.length - +others.Classement;
-                    scoreS += (score )/(data.length )*6+1;
+                    scoreS += score;
                     break;
             }
         })
+        scoreA = scoreA / fromA.length;
+        scoreS = scoreS / fromS.length;
+        scoreB = scoreB / fromB.length;
         console.log(`scoreS: ${scoreS} scoreB: ${scoreB} scoreA: ${scoreA}`)
 
 
@@ -294,6 +344,8 @@ const VisContainer = ({styles:s}:PropType)=>{
             return color;
          })
          .attr('stroke','black')
+         .on('mouseover',handleMouseOver)
+         .on('mouseleave', handleMouseLeave)
 
 
 
@@ -333,9 +385,11 @@ const VisContainer = ({styles:s}:PropType)=>{
             return color;
          })
          .attr('stroke','black')
+         .on('mouseover',handleMouseOver)
+         .on('mouseleave', handleMouseLeave)
 
          filledGrid = filledGrid.sort((a,b)=>Math.random()-0.5)
-
+        
 
          bejaia.selectAll('data-bejaia-circle').data(fromB)
          .enter()
@@ -356,6 +410,7 @@ const VisContainer = ({styles:s}:PropType)=>{
             //@ts-ignore
             return  40+ filledGrid[i]?.y  -rectH/2
         })
+        
          .attr("fill",d=>{
             const score = data.length - +d.Classement;
             const ratio =  (score )/(data.length );
@@ -372,10 +427,9 @@ const VisContainer = ({styles:s}:PropType)=>{
             return color;
          })
          .attr('stroke','black')
-         .on('mouseover',function (e,d){
-            d3.select(this)
-            
-         })
+         .on('mouseover',handleMouseOver)
+         .on('mouseleave', handleMouseLeave)
+        
 
         console.log(width,height,runOnce)
 
