@@ -171,6 +171,7 @@ const VisContainer = ({styles:s}:PropType)=>{
                 let s = '';
                 for(let i=0;i<this.rows;i++){
                     for(let j=0;j<this.cols;j++){
+                      
                         s += this.grid[i*cols +j]+ ' ';
                     }
                     s+=`
@@ -179,7 +180,7 @@ const VisContainer = ({styles:s}:PropType)=>{
                 return s;
             }
         }
-        const active = []
+        const active:{x:number,y:number}[] = []
         function random(min:number,max:number,floor:boolean = true){
             let res =  Math.random()*(max-min)+min;
             if(floor) res = Math.floor(res);
@@ -194,16 +195,48 @@ const VisContainer = ({styles:s}:PropType)=>{
         const grid = new Grid(rows,cols)
         console.log(grid)
         
-        let x = random(algeiersLeftPoint.x,algeiersLeftPoint.x+rectW)
-        let y = random(algeiersLeftPoint.y,algeiersLeftPoint.y+rectH)
+        let x = random(0,rectW)
+        let y = random(0,rectH)
 
         const rp = {x,y};
+        console.log(rp)
         active.push(rp);
         grid.set(
             Math.floor(y/w),
             Math.floor(x/w),
             rp
         )
+        while(active.length >0){
+            const randomIndex = Math.floor(Math.random()*active.length);
+            const point = active[randomIndex];
+            for(let t = 0;t<k;t++){
+                const randomRadius = random(r,2*r);
+                const randomAngle = random(0,Math.PI*2);
+                const x = point.x + Math.cos(randomAngle);
+                const y = point.y - Math.sin(randomAngle);
+                const col =  Math.floor(x/w)
+                const row = Math.floor(y/w)
+                let found = false;
+                for(let i=-1;i<=1 && !found;i++){
+                    for(let j=-1;j<=1 && !found;j++){
+                        if(grid.at(row,col)!== -1){
+                            const neighbor = grid.at(row,col) as {x:number,y:number} ;
+                            const dist = Math.hypot(neighbor.x -x,neighbor.y - y);
+                            if(dist < randomRadius){
+                                found = true;
+                            }
+
+                        }
+
+
+                    }
+                }
+                if(!found){
+                    active.push({x,y});
+                }
+
+            }
+        }
 
         
 
