@@ -2,11 +2,14 @@ import { CSSProperties, useEffect, useId, useLayoutEffect, useRef, useState } fr
 import styles from './VisContainer.module.css';
 import * as d3 from 'd3';
 import {data} from '../../data'
+//@ts-ignore
+import * as uniqid from 'uniqid'
 interface PropType{
     styles:CSSProperties;
 }
 
 const VisContainer = ({styles:s}:PropType)=>{
+    
 
     const [runOnce,setRunOnce] = useState(false);
 
@@ -43,15 +46,6 @@ const VisContainer = ({styles:s}:PropType)=>{
             
 
 
-            // .insert('text', ':last-child')
-            // .classed('removeableText', true)
-            // .attr("x", target.attr('cx'))
-            // .attr("y", +target.attr('cy')-+target.attr('r')-5)
-            // .attr("dy", ".35em")
-            // .attr('stroke',"black")
-            // .attr("font-size", "12")
-            // .attr("text-anchor", "middle")
-            // .text('score: '+score)
          }
          function handleMouseLeave(e: { path: any[]; }) {
             console.log('leave', e.path[1])
@@ -435,6 +429,51 @@ const VisContainer = ({styles:s}:PropType)=>{
 
 
 
+        //fleches d'affectation
+        function drawArrow(
+            svg:d3.Selection<SVGSVGElement, unknown, null,undefined>,
+             {x,y,placement}:{x:number,y:number,placement:'start'|'end'}
+             ){
+            const arrowId = 'arrow'+uniqid()
+            const arrowContainer = svg.append('g')
+            arrowContainer
+            .attr("transform",`translate(${x},${y})`)
+
+            let line = arrowContainer.append("line")
+            .attr("x1",20)  
+            .attr("y1",0)  
+            .attr("x2",-20)  
+            .attr("y2",0)  
+            .attr("stroke","black")  
+            .attr("stroke-width",5)  
+            if(placement === 'start') line.attr("marker-start",`url(#${arrowId})`); 
+            else if(placement === 'end') line.attr("marker-end",`url(#${arrowId})`); 
+
+            
+            
+             arrowContainer.append("svg:defs")
+             const marker  = arrowContainer.append("svg:marker")
+             .attr("id", arrowId)
+             .attr("viewBox", "0 -5 10 10")
+             .attr('refX', 0) // distance from the head of the arrow in the x-axis]
+             .attr('refY', 0)
+             .attr("markerWidth", 4)
+             .attr("markerHeight", 4)
+             marker.append("svg:path")
+             .attr("d", "M0,-5L10,0L0,5");
+
+             if(placement === 'start') marker.attr("orient",'0deg'); 
+             else if(placement === 'end') marker.attr("orient",'180deg'); 
+ 
+
+
+        
+          
+
+        }
+        drawArrow(svg,{x:rectW,y:20,placement:'end'})
+        drawArrow(svg,{x:rectW,y:rectH-20,placement:'start'})
+      
         setRunOnce(true)
 
 
@@ -455,3 +494,4 @@ const VisContainer = ({styles:s}:PropType)=>{
     )
 }
 export default VisContainer;
+
