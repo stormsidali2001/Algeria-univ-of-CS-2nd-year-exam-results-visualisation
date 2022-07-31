@@ -60,6 +60,15 @@ const VisContainer = ({styles:s}:PropType)=>{
         let scoreA = 0;
         let scoreB = 0;
         let scoreS = 0;
+        //from university to another one
+        let A_B = 0;
+        let A_S = 0;
+
+        let B_A = 0;
+        let B_S = 0;
+
+        let S_A = 0;
+        let S_B = 0;
 
         data.forEach(({Origine,...others})=>{
             switch(Origine){
@@ -67,16 +76,23 @@ const VisContainer = ({styles:s}:PropType)=>{
                     fromA.push({...others});
                     let score = data.length - +others.Classement;
                     scoreA += score;
+                    if(others.Affectation === 'B') A_B++;
+                    else  if(others.Affectation === 'S') A_S++;
                     break;
                 case 'B':
                     fromB.push({...others})
                     score = data.length - +others.Classement;
                     scoreB += score;
+                    if(others.Affectation === 'A') B_A++;
+                    else  if(others.Affectation === 'S') B_S++;
                     break;
                 case 'S':
                     fromS.push({...others})
                     score = data.length - +others.Classement;
                     scoreS += score;
+                    if(others.Affectation === 'B') S_B++;
+                    else  if(others.Affectation === 'A') S_A++;
+                    
                     break;
             }
         })
@@ -466,13 +482,92 @@ const VisContainer = ({styles:s}:PropType)=>{
              else if(placement === 'end') marker.attr("orient",'180deg'); 
  
 
+             return arrowContainer
+
 
         
           
 
         }
-        drawArrow(svg,{x:rectW,y:20,placement:'end'})
-        drawArrow(svg,{x:rectW,y:rectH-20,placement:'start'})
+        const arrow1 = drawArrow(svg,{x:rectW,y:20,placement:'end'})
+        const arrow2 = drawArrow(svg,{x:rectW,y:rectH-20,placement:'start'})
+        const arrow3 = drawArrow(svg,{x:rectW*2,y:20,placement:'end'})
+        const arrow4 = drawArrow(svg,{x:rectW*2,y:rectH-20,placement:'start'})
+         arrow1
+        .append('g')
+        .append('circle')
+        .attr('fill',"black")
+        .attr('r',10)
+       
+        .attr('cx',0)
+        .attr('cy',0)
+        
+        arrow1.select('g')
+        .append('text')
+        .attr("x", 0)
+        .attr("y",0)
+        .attr("dy", ".35em")
+        .attr('stroke',"white")
+        .attr("font-size", "13")
+        .attr("text-anchor", "middle")
+        .text(B_S)
+
+        arrow2
+        .append('g')
+        .append('circle')
+        .attr('fill',"black")
+        .attr('r',10)
+       
+        .attr('cx',0)
+        .attr('cy',0)
+        
+        arrow2.select('g')
+        .append('text')
+        .attr("x", 0)
+        .attr("y",0)
+        .attr("dy", ".35em")
+        .attr('stroke',"white")
+        .attr("font-size", "13")
+        .attr("text-anchor", "middle")
+        .text(S_B)
+
+        arrow3
+        .append('g')
+        .append('circle')
+        .attr('fill',"black")
+        .attr('r',10)
+       
+        .attr('cx',0)
+        .attr('cy',0)
+        
+        arrow3.select('g')
+        .append('text')
+        .attr("x", 0)
+        .attr("y",0)
+        .attr("dy", ".35em")
+        .attr('stroke',"white")
+        .attr("font-size", "13")
+        .attr("text-anchor", "middle")
+        .text(A_B)
+
+        arrow4
+        .append('g')
+        .append('circle')
+        .attr('fill',"black")
+        .attr('r',10)
+       
+        .attr('cx',0)
+        .attr('cy',0)
+        
+        arrow4.select('g')
+        .append('text')
+        .attr("x", 0)
+        .attr("y",0)
+        .attr("dy", ".35em")
+        .attr('stroke',"white")
+        .attr("font-size", "13")
+        .attr("text-anchor", "middle")
+        .text(B_A)
       
         setRunOnce(true)
 
